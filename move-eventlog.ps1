@@ -57,6 +57,7 @@ foreach($Computer in $Computers){
         Set-ItemProperty -Path "$regPath\$LogName" -Name "File" -value "$Path\$LogFileName.evtx"
         restart-service EventLog
         write-host "I have completed the change. Please validate that the eventlog is in the correct location."
+        exit 0
     }
     else{
         Write-Host "The log $logname does not exist."
