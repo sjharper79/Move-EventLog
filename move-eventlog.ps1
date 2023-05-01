@@ -8,10 +8,14 @@ This must be run in an elevated powershell window or it will not write to the re
 This parameter is the name of the event log. You can use Security, Application, System, Setup, or any of the logs found in the event logs channels.
 .PARAMETER Path
 This is the fully qualified path you want the new logs to be stored in. Do not include the filename. The path must already exist.
+.PARAMETER ComputerList
+A text file that contains a new-line separated list of computers on which to run the script. 
 .EXAMPLE
 .\move-eventlog.ps1 -LogName Security -Path Q:\Windows\EventLogs
 .EXAMPLE
 .\move-eventlog.ps1 -LogName Microsoft-Windows-PowerShell/Operational -Path C:\Windows\EventLogs
+.EXAMPLE
+.\move-eventlog.ps1 -LogName Application -Path Q:\Windows\EventLogs -ComputerList .\computers.txt
 .NOTES
 Author: Stephen Harper
 Company: Alpha Omega
