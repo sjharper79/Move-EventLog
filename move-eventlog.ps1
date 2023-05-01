@@ -21,7 +21,16 @@ Author: Stephen Harper
 Company: Alpha Omega
 Client: Department of State
 Date: May 1, 2023
-Version 1.0
+Version 2.0
+ChangeLog:
+Version 1.0 
+    Initial Version
+    Runs on only a single computer (the local computer)
+Version 2.0
+    Multiple-Computer aware
+    Runs on many computers or the local computer only. 
+    Requires functioning WinRM.
+
 #>
 
 param(
