@@ -25,29 +25,41 @@ param(
     [Parameter(Mandatory, HelpMessage = "Enter the log you want to reconfigure.`nExample 'Microsoft-Windows-PowerShell/Operational'.")]
     [String] $LogName,
     [Parameter(Mandatory, HelpMessage = "Enter the path where you want these logs to be located.")]
-    [String] $Path
+    [String] $Path,
+    [Parameter(HelpMessage = "The file that has a list of computers to run this script on.")]
+    [String] $ComputerList = ""
 )
 
-$MainLogs = @("application","system","security","setup", "forwarded events")
-if($MainLogs -notcontains $Logname.toLower()){
+if($ComputerList -ne ""){
+    $Computers = get-content $ComputerList
+}
+else {
+    $Computers = localhost
+}
+foreach($Computer in $Computers){
+    Enter-PSSession $Computer
+
+    $MainLogs = @("application","system","security","setup", "forwarded events")
+    if($MainLogs -notcontains $Logname.toLower()){
     $regPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WINEVT\Channels"
-}
-else
-{
-    $regPath = "HKLM:\SYSTEM\CurrentControlSet\Services\EventLog"
-}
-if(Test-Path ("$regPath\$LogName")){
-    write-host "After looking in the registry for the event log $logname, I see it is present in the channels key."
-    write-host "I will now configure the registry to use the new path for the event log."
-    $LogFileName = $LogName -replace '/','%4'
-    
-    New-ItemProperty "$regPath\$logName" -Name "AutoBackupLogFiles" -Value "1" -PropertyType "DWord"
-    New-ItemProperty "$regPath\$logName" -Name "Flags" -Value "1" -PropertyType "DWord"
-    Set-ItemProperty -Path "$regPath\$LogName" -Name "File" -value "$Path\$LogFileName.evtx"
-    restart-service EventLog
-    write-host "I have completed the change. Please validate that the eventlog is in the correct location."
-}
-else{
-    Write-Host "The log $logname does not exist."
-    exit 1
+    }   
+    else
+    {
+        $regPath = "HKLM:\SYSTEM\CurrentControlSet\Services\EventLog"
+    }
+    if(Test-Path ("$regPath\$LogName")){
+        write-host "After looking in the registry for the event log $logname, I see it is present in the channels key."
+        write-host "I will now configure the registry to use the new path for the event log."
+        $LogFileName = $LogName -replace '/','%4'
+        
+        New-ItemProperty "$regPath\$logName" -Name "AutoBackupLogFiles" -Value "1" -PropertyType "DWord"
+        New-ItemProperty "$regPath\$logName" -Name "Flags" -Value "1" -PropertyType "DWord"
+        Set-ItemProperty -Path "$regPath\$LogName" -Name "File" -value "$Path\$LogFileName.evtx"
+        restart-service EventLog
+        write-host "I have completed the change. Please validate that the eventlog is in the correct location."
+    }
+    else{
+        Write-Host "The log $logname does not exist."
+        exit 1
+    }
 }
