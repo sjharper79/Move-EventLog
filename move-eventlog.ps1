@@ -39,8 +39,11 @@ else
 if(Test-Path ("$regPath\$LogName")){
     write-host "After looking in the registry for the event log $logname, I see it is present in the channels key."
     write-host "I will now configure the registry to use the new path for the event log."
-    $LogFileName = $LogName -replace "/",'%4'
-    Set-ItemProperty -Path "$regName\$LogName" -Name "File" -value "$Path\$LogFileName.evtx"
+    $LogFileName = $LogName -replace '/','%4'
+    
+    New-ItemProperty "$regPath\$logName" -Name "AutoBackupLogFiles" -Value "1" -PropertyType "DWord"
+    New-ItemProperty "$regPath\$logName" -Name "Flags" -Value "1" -PropertyType "DWord"
+    Set-ItemProperty -Path "$regPath\$LogName" -Name "File" -value "$Path\$LogFileName.evtx"
     restart-service EventLog
     write-host "I have completed the change. Please validate that the eventlog is in the correct location."
 }
